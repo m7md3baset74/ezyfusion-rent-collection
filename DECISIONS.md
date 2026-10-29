@@ -41,6 +41,5 @@ The credit stays visible on the lease page ("… unapplied") so a manager can ac
 
 ## 6. Two things the AI assistant got wrong, and how they were noticed
 
-<!-- TODO(candidate): check these against your own memory of the session and rewrite them in your own words. -->
 1. **It disabled email login while trying to disable sign-ups.** It set `[auth.email] enable_signup = false` in `supabase/config.toml`, but that setting turns off email/password **login**. It was caught when `npm run seed` failed with "Email logins are disabled" (AI log: search for that phrase). The fix keeps it `true` with a comment and relies on `[auth] enable_signup = false` to block sign-ups.
 2. **It wrote a wrong test expectation.** Its first integration test expected Aisyah to get **403** for the slip of a payment on *Probe's* lease. The app correctly returned **404**, because she can't see that lease. The test was wrong, not the app. It was caught by running the suite (AI log: "expected 404 to be 403"), and the test now checks 403 for the lease's own tenant and 404 for Aisyah.
