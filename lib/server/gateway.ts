@@ -1,7 +1,8 @@
 // Online payments: bill creation (tenant) and the gateway webhook (the only thing that can settle a bill).
-import { createHmac, randomBytes, timingSafeEqual } from 'node:crypto'
+import { randomBytes } from 'node:crypto'
 import { amountDueNow } from '../allocation'
 import { malaysiaDate } from '../billing'
+import { signatureIsValid } from '../gateway-signature'
 import { senToNumber } from '../money'
 import { prisma } from '../prisma'
 import { parseGatewayTime } from '../time'
@@ -25,24 +26,6 @@ export async function createGatewayBill(caller: Caller, leaseId: string, now = n
     })
     return { billId: bill.id, amountSen: senToNumber(bill.amount_sen) }
   }, TX_OPTIONS)
-}
-
-// Every field except x_signature, sorted by key (character code order), as key+value, joined with '|'.
-export function signatureSource(fields: [string, string][]): string {
-  return fields
-    .filter(([key]) => key !== 'x_signature')
-    .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
-    .map(([key, value]) => `${key}${value}`)
-    .join('|')
-}
-
-export function computeSignature(fields: [string, string][], key: string): string {
-  return createHmac('sha256', key).update(signatureSource(fields)).digest('hex')
-}
-
-function signatureIsValid(fields: [string, string][], provided: string | undefined, key: string): boolean {
-  if (!provided || !/^[0-9a-f]{64}$/i.test(provided)) return false
-  return timingSafeEqual(Buffer.from(computeSignature(fields, key), 'hex'), Buffer.from(provided, 'hex'))
 }
 
 type WebhookResult = { status: number; body: Record<string, unknown> }
