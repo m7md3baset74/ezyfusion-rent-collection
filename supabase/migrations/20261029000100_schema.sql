@@ -120,6 +120,7 @@ create table public.payments (
   created_at timestamptz not null default now(),
   foreign key (lease_id, org_id) references public.leases (id, org_id),
   foreign key (gateway_bill_id, lease_id) references public.gateway_bills (id, lease_id),
+  unique (gateway_bill_id, lease_id), -- redundant with unique(gateway_bill_id); lets Prisma model the 1:1 relation
   unique (id, org_id),
   check (unapplied_sen >= 0 and unapplied_sen <= amount_sen),
   check ((method = 'bank_transfer') = (slip_path is not null)),

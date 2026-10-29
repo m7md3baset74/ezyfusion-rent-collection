@@ -51,3 +51,7 @@ BRIEF.md
 supabase/.branches
 supabase/.temp
 
+
+# local tooling
+/.claude/
+
