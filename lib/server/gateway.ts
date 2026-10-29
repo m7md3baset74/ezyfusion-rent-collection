@@ -6,7 +6,7 @@ import { signatureIsValid } from '../gateway-signature'
 import { senToNumber } from '../money'
 import { prisma } from '../prisma'
 import { parseGatewayTime } from '../time'
-import { findLeaseForCaller, type Caller } from './caller'
+import { canSeeLease, findLeaseForCaller, type Caller } from './caller'
 import { allocatePayment, loadInvoiceBalances, lockLease, TX_OPTIONS, writeAudit } from './db'
 import { dbErrorCode, forbidden, HttpError } from './http'
 
@@ -26,6 +26,17 @@ export async function createGatewayBill(caller: Caller, leaseId: string, now = n
     })
     return { billId: bill.id, amountSen: senToNumber(bill.amount_sen) }
   }, TX_OPTIONS)
+}
+
+// For /payments/return: the bill's stored status, if the caller may see its lease. Read-only.
+export async function getBillForCaller(caller: Caller, billId: string) {
+  if (!BILL_ID_RE.test(billId)) return null
+  const bill = await prisma.gateway_bills.findUnique({
+    where: { id: billId },
+    include: { leases: { select: { org_id: true, tenant_id: true } } },
+  })
+  if (!bill || !canSeeLease(caller, bill.leases)) return null
+  return { id: bill.id, status: bill.status, amountSen: senToNumber(bill.amount_sen), leaseId: bill.lease_id }
 }
 
 type WebhookResult = { status: number; body: Record<string, unknown> }
