@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { buttonVariants } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { formatSen } from '@/lib/money'
@@ -12,8 +13,13 @@ export default async function LeasesPage() {
 
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>Leases</CardTitle>
+        {caller.role === 'manager' ? (
+          <Link href="/leases/new" className={buttonVariants({ size: 'sm' })}>
+            New lease
+          </Link>
+        ) : null}
       </CardHeader>
       <CardContent>
         {leases.length === 0 ? (

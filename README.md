@@ -55,9 +55,14 @@ Prisma's `schema.prisma` is introspected from the migrations (`npx prisma db pul
 - `npm run seed` refuses to run on a non-empty database (run `npx supabase db reset` first).
 - Auth rate limits for sign-in and token refresh are raised in `config.toml` so automated tests can sign in many times.
 
+## Bonus done
+
+- **Create-lease form with a live schedule preview** (`/leases/new`, managers only). The preview runs the same `generateSchedule` the server uses, and submitting goes through `POST /api/leases`, which re-checks everything.
+- Unit tests for `lib/billing.ts`, allocation and the webhook signature, plus the integration suite above.
+
 ## Skipped
 
-- Bonus items: the create-lease form with live preview, realtime updates on the tenant portal, and server-side search and pagination of leases. Leases are created through `POST /api/leases`.
+- Bonus items: realtime updates on the tenant portal (Realtime is disabled in `config.toml` to save RAM) and server-side search and pagination of leases.
 - A UI for applying an online overpayment (`unapplied_sen`) to reopened invoices. See DECISIONS.md, question 5.
 
 ## What I would do next

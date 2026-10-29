@@ -56,3 +56,13 @@ export function lastMonths(count: number, now = new Date()): { from: string; to:
   const to = malaysiaDate(now).slice(0, 7)
   return { from: shiftMonth(to, -(count - 1)), to }
 }
+
+// Choices for the create-lease form: only the manager's own organization.
+export async function leaseFormOptions(caller: Caller) {
+  requireRole(caller, 'manager')
+  const [units, tenants] = await Promise.all([
+    prisma.units.findMany({ where: { org_id: caller.orgId }, select: { id: true, name: true }, orderBy: { name: 'asc' } }),
+    prisma.tenants.findMany({ where: { org_id: caller.orgId }, select: { id: true, full_name: true }, orderBy: { full_name: 'asc' } }),
+  ])
+  return { units, tenants: tenants.map((t) => ({ id: t.id, name: t.full_name })) }
+}
