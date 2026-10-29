@@ -4,8 +4,9 @@ import { adminClient } from '../supabase/admin'
 
 export const SLIP_BUCKET = 'payment-slips'
 
+// '<org_id>/<file>' or deeper ('<org_id>/<folder>/<file>'); no empty segments, '..' or backslashes.
 export function isSlipPathInOrg(orgId: string, path: string): boolean {
-  return path.startsWith(`${orgId}/`) && /^[^/]+\/[^/]+$/.test(path) && !path.includes('..')
+  return path.startsWith(`${orgId}/`) && /^[^/\\]+(\/[^/\\]+)+$/.test(path) && !path.includes('..')
 }
 
 export async function slipExists(path: string): Promise<boolean> {

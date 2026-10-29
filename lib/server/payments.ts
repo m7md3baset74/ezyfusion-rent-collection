@@ -11,7 +11,7 @@ const recordSchema = z.object({
   amountSen: z.number().int().positive().max(Number.MAX_SAFE_INTEGER),
   method: z.enum(['cash', 'bank_transfer']),
   receivedAt: z.string(),
-  slipPath: z.string().optional(),
+  slipPath: z.string().nullish(), // null or absent: no slip
 })
 
 const reasonSchema = z.object({
@@ -43,7 +43,7 @@ async function recordPaymentChecked(caller: Caller, leaseId: string, input: unkn
       throw badRequest("slipPath must point to an uploaded file in the organization's folder")
     }
     slipPath = body.slipPath
-  } else if (body.slipPath !== undefined) {
+  } else if (body.slipPath != null) {
     throw badRequest('Only bank transfers take a slip')
   }
 

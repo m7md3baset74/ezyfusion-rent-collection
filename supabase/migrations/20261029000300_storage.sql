@@ -10,7 +10,6 @@ on conflict (id) do update
 create policy payment_slips_insert on storage.objects for insert to authenticated
   with check (
     bucket_id = 'payment-slips'
-    and array_length(storage.foldername(name), 1) = 1
     and (storage.foldername(name))[1] in (select org_id::text from private.member_org_ids() as org_id)
   );
 
