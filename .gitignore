@@ -41,8 +41,6 @@ yarn-error.log*
 next-env.d.ts
 !.env.example
 
-# assessment brief (repo is public)
-BRIEF.md
 
 # generated prisma client
 /lib/generated/
